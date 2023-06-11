@@ -1,77 +1,57 @@
-# Overview
-The code provided is a modified version of the nRF-jammer project available on GitHub. It utilizes an Arduino board, an SSD1306 OLED display, and an NRF24L01 module to scan and display activity levels on 2.4GHz channels. The program allows for channel selection and provides the option to enable jamming on a specific channel.  
+# general
+
+This program enables an ESP8266 board to function as a 2.4GHz scanner, capable of scanning and analyzing the signal strength of different channels. It utilizes the NRF24L01 radio module and an OLED display to visualize the channel information.
+
+## Credits
+
+This program is inspired by and based on the [nRF-Jammer](https://github.com/cifertech/nRF-jammer) project by [CiferTech](https://github.com/cifertech). It has been adapted and modified to work with the ESP8266 board.
 
 ## Pinout
-The following table shows the pinout configuration used in the code:
 
-| Pin   | Function                      |
-|-------|-------------------------------|
-| BT1   | Button 1 pin (channel select) |
-| BT2   | Button 2 pin (jamming toggle) |
-| CE    | NRF24L01 Chip Enable pin      |
-| SDA   | I2C data pin for SSD1306      |
-| SCL   | I2C clock pin for SSD1306     |
+The pinout configuration for the components used in this program is as follows:
 
-Please ensure that you connect the corresponding pins on your Arduino board.
+| Component       | ESP8266 Pin | Default Pin |
+| --------------- | ----------- | ----------- |
+| OLED Display    | SDA         | D2          |
+| OLED Display    | SCL         | D1          |
+| OLED Display    | RST         | D4          |
+| NRF24L01 Radio  | CE          | D7          |
+| NRF24L01 Radio  | CSN         | D8          |
+| Button 1        |             | D2          |
+| Button 2        |             | D3          |
 
-## Program Flowchart
+Please note that the pin assignments may need to be adjusted based on your specific wiring configuration.
+
+## Flowchart
+
+The flowchart represents the basic operation of the ESP8266 2.4GHz scanner. It starts with the initialization step, followed by scanning the channels. If jamming is not enabled, the channel information is outputted. The flow continues until the end is reached. If jamming is enabled, it toggles the jamming on the current channel and then proceeds to the next iteration.
 
 ```mermaid
-graph TD
-  Start --> Initialize
-  Initialize --> Setup
-  Setup --> Loop
-  Loop --> Display
-  Loop --> |Jamming enabled| Jamming
-  Loop --> ScanChannels
-  ScanChannels --> Output
-  Output --> Delay
-  Delay --> Loop
+graph LR
+A(Start) --> B[Initialize]
+B --> C[Scan Channels]
+C --> D{Jamming Enabled?}
+D -- No --> E[Output Channels]
+E --> F{End?}
+F -- No --> B
+D -- Yes --> G[Toggle Jamming]
+G --> F
+y --> Loop
 ```
 
-<!--
-  This flowchart represents the program flow of the modified and adapted code.
-  Original code available at: https://github.com/cifertech/nRF-jammer
-  Modified and adapted by [Your Name] for specific requirements.
--->
+For a detailed explanation of the flowchart, please refer to the [Flowchart Explanation](#flowchart-explanation) section.
 
-## flowchart explanation
-```
-Start
-|
-+-- Initialize I2C display and NRF24 module
-|
-+-- Enter setup routine
-|   |
-|   +-- Initialize variables and display
-|   |
-|   +-- Set NRF24 module configuration
-|   |
-|   +-- Enter loop routine
-|
-+-- Enter loop routine
-    |
-    +-- Clear display and set text size/color
-    |
-    +-- Display current channel on the OLED display
-    |
-    +-- If jamming is enabled
-    |   |
-    |   +-- Display jamming channel on the OLED display
-    |   |
-    |   +-- Configure NRF24 module for jamming
-    |   |
-    |   +-- Enter jamming loop
-    |
-    +-- Scan channels and calculate activity levels
-    |
-    +-- Output activity levels on the OLED display
-    |
-    +-- Delay for a short period
-|
-End
-```
+## Flowchart Explanation
 
-  This program is based on the code available at:
-  https://github.com/cifertech/nRF-jammer
-  Modified and adapted to use an i2c oled display module.
+1. Start: The program execution starts at this point.
+2. Initialize: Initialization step where the necessary components, such as the OLED display and NRF24L01 radio, are set up and configured.
+3. Scan Channels: The program scans the 2.4GHz frequency channels using the NRF24L01 radio to measure the signal strength of each channel.
+4. Jamming Enabled?: Check if jamming is enabled or not.
+   - No: If jamming is not enabled, proceed to the next step.
+     - Output Channels: Display the signal strength of each channel on the OLED display.
+     - End?: Check if the program has reached its end condition.
+       - No: If not, go back to the initialization step to continue scanning.
+   - Yes: If jamming is enabled, toggle the jamming on the current channel and proceed to the next iteration.
+     - Toggle Jamming: Activate or deactivate the jamming mechanism on the current channel.
+     - End?: Check if the program has reached its end condition.
+       - No: If not, go back to the initialization step to continue scanning.
